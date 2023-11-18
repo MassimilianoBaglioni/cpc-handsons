@@ -29,18 +29,24 @@ fn run_tests(){
     use std::path::Path;
     use std::path::PathBuf;
 
-    let filename = "input0.txt";
+    let input_filename = "input0.txt";
+    let output_filename = "output0.txt";
     let directory_path = "src/Testset_handson2_2324_p1/";
-    let full_path = PathBuf::from(directory_path).join(Path::new(filename));
 
-    let contents = fs::read_to_string(full_path).expect("Failed to open the test file.");
+    let input_full_path = PathBuf::from(directory_path).join(Path::new(input_filename));
+    let output_full_path = PathBuf::from(directory_path).join(Path::new(output_filename));
 
-    let lines: Vec<&str> = contents.lines().collect();
+    let input_contents = fs::read_to_string(input_full_path).expect("Failed to open the test file.");
+    let output_contents = fs::read_to_string(output_full_path).expect("Failed to open the test file.");
 
-    for line in lines{
-        let values: Vec<i32> = line.split_whitespace().map(|s| s.parse::<i32>().unwrap()).collect();
+    let input_lines: Vec<&str> = input_contents.lines().collect();
+    let output_lines : Vec<i32> = output_contents.lines().map(|s| s.parse::<i32>().unwrap()).collect();
+    println!("{:?}", output_lines);
+
+    for line in input_lines.iter().skip(2){
+        let input_values: Vec<i32> = line.split_whitespace().map(|s| s.parse::<i32>().unwrap()).collect();
         
-        println!("{:?}", values);
+        println!("{:?}", input_values);
         }
     }
 
