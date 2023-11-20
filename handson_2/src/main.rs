@@ -27,26 +27,70 @@ impl SegmentTree {
         println!("called update on {},{},{}", i, j, t);
         vec![0; 2]
     }
+    fn query_max(&self, left: usize, right: usize) -> i32 {
+        let mut left = left + self.size - 1;
+        let mut right = right + self.size - 1;
+        let mut max_val = std::i32::MIN;
+
+        while left <= right {
+            if left % 2 == 1 {
+                max_val = max_val.max(self.tree[left]);
+                left += 1;
+            }
+            if right % 2 == 0 {
+                max_val = max_val.max(self.tree[right]);
+                right -= 1;
+            }
+            left /= 2;
+            right /= 2;
+        }
+
+        max_val
+    }
+
+    fn update_max_iterative(&mut self, i: usize, j: usize, t: i32) {
+        let mut i = i + self.size;
+        let mut j = j + self.size;
+        while i <= j {
+            if i % 2 == 1 {
+                self.tree[i] = self.tree[i].min(t);
+                i += 1;
+            }
+            if j % 2 == 0 {
+                self.tree[j] = self.tree[j].min(t);
+                j -= 1;
+            }
+            j /= 2;
+            j /= 2;
+        }
+    }
 
     //TODO j is exclusive.
     fn max(&self, mut i: usize, mut j: usize) -> i32 {
         i += self.size;
         j += self.size;
+        println!(" first init i:{}j:{}", i, j);
 
         let mut max_val = std::i32::MIN;
+        println!("tree: {:?}", self.tree);
 
         while i < j {
             if (i & 1) == 1 {
                 //i is odd
                 max_val = max_val.max(self.tree[i]);
+                println!("i is odd i:{}j:{} new max assigned {}", i, j, max_val);
                 i += 1;
             }
             if (j & 1) == 1 {
                 j -= 1;
                 max_val = max_val.max(self.tree[j]);
+                println!("j is odd i:{}j:{} new max assigned {}", i, j, max_val);
             }
+            println!("pre / i:{}j:{}", i, j);
+
             i /= 2;
             j /= 2;
+            println!("i:{}j:{}", i, j);
         }
         //println!("called max on {},{},", i, j);
         max_val
@@ -62,7 +106,7 @@ fn run_tests() {
     use std::path::PathBuf;
 
     let directory_path = "src/Testset_handson2_2324_p1/";
-    let tree = SegmentTree::new(&[1, 2, 3, 4]);
+    let mut tree = SegmentTree::new(&[1, 2, 3, 4]);
 
     //TODO Hardcoded number of txt should refactor and count the number of txt files in the folder
     for i in 0..=10 {
@@ -81,6 +125,7 @@ fn run_tests() {
         let output_array: Vec<i32> = output_contents
             .lines()
             .map(|s| s.parse::<i32>().unwrap())
+            .filter(|&num| num != '\n' as i32) // Exclude newline characters
             .collect();
 
         let mut all_input_values: Vec<Vec<i32>> = Vec::new();
@@ -99,13 +144,22 @@ fn run_tests() {
         let input_values = &all_input_values[1];
         let n = &all_input_values[0][0];
         let mut output_index = 0;
+        tree = SegmentTree::new(&input_values);
+        println!("working on input: {}", input_filename);
 
         for line in all_input_values.iter().skip(2) {
             if line[0] == 0 {
                 tree.update(line[1] as usize, line[2] as usize, line[3] as usize);
             } else if line[0] == 1 {
-                tree.max(line[1] as usize, line[2] as usize);
-                println!("assert {}", output_array[output_index]);
+                println!("assert {:?}", output_array);
+                println!(
+                    "max return {}",
+                    tree.query_max(line[1] as usize, line[2] as usize)
+                );
+                assert!(
+                    tree.query_max(line[1] as usize, line[2] as usize)
+                        == output_array[output_index]
+                );
                 output_index += 1;
             }
         }
@@ -113,9 +167,12 @@ fn run_tests() {
 }
 
 fn main() {
-    let tree = SegmentTree::new(&[2, 1, 4, 3, 2]);
+    let mut tree = SegmentTree::new(&[5, 1, 4, 3, 2]);
 
-    println!("{} max", tree.max(2, 3));
-    println!("{} max", tree.max(1, 2));
+    //println!("{} max", tree.max(2, 3));
+    //println!("{} max", tree.max(0, 2));
+    //println!("{} new max", tree.query_max(5, 5));
+    tree.update_max_iterative(1, 2, 2);
+    println!("{:?}", tree.tree);
     //run_tests();
 }
