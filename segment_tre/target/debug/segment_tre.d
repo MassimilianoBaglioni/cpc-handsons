@@ -1,0 +1,1 @@
+/Users/massimilianobaglioni/Documents/Unipi/Competitive\ Programming/handsons/segment_tre/target/debug/segment_tre: /Users/massimilianobaglioni/Documents/Unipi/Competitive\ Programming/handsons/segment_tre/src/main.rs

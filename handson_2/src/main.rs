@@ -172,7 +172,7 @@ fn main() {
     //println!("{} max", tree.max(2, 3));
     //println!("{} max", tree.max(0, 2));
     //println!("{} new max", tree.query_max(5, 5));
+
     tree.update_max_iterative(1, 2, 2);
-    println!("{:?}", tree.tree);
     //run_tests();
 }

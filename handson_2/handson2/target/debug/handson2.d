@@ -1,0 +1,1 @@
+/Users/massimilianobaglioni/Documents/Unipi/Competitive\ Programming/handsons/handson_2/handson2/target/debug/handson2: /Users/massimilianobaglioni/Documents/Unipi/Competitive\ Programming/handsons/handson_2/handson2/src/main.rs
