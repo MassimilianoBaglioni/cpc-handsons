@@ -1,1 +1,1 @@
-/Users/massimilianobaglioni/Documents/Unipi/Competitive\ Programming/handsons/segment_2/target/debug/segment_2: /Users/massimilianobaglioni/Documents/Unipi/Competitive\ Programming/handsons/segment_2/src/main.rs
+/home/massimiliano/Documents/Coding/handsons/cpc-handsons/segment_2/target/debug/segment_2: /home/massimiliano/Documents/Coding/handsons/cpc-handsons/segment_2/src/main.rs

@@ -175,8 +175,30 @@ mod tests {
     }
 }
 
+fn sweep(array: &mut Vec<Vec<i64>>) -> Vec<i64> {
+    let mut result_array = vec![0; array.len() + 1];
+    let mut events = vec![[0, 0]; 2 * array.len()];
+
+    array.sort_by(|a, b| a.cmp(b));
+    for (index, el) in array.iter().enumerate() {
+        events[index * 2][0] = el[0];
+        events[index * 2][1] = 1;
+        events[index * 2 + 1][0] = el[1] + 1;
+        events[index * 2 + 1][1] = -1;
+    }
+    events.sort_by(|a, b| a.cmp(b));
+    println!("{:?}", events);
+    let mut crt = 0;
+    for el in events {
+        crt += el[1];
+        result_array[el[0] as usize] = crt;
+    }
+
+    return result_array[0..result_array.len() - 1].to_vec();
+}
+
 fn main() {
-    let arr = vec![9, 4, 1, 6, 5, 10, 6, 8, 7, 4];
-    let mut segment_tree = SegmentTree::new(arr.len());
-    segment_tree.build(&arr);
+    let mut vector_of_vectors: Vec<Vec<i64>> =
+        vec![vec![0, 4], vec![1, 3], vec![1, 2], vec![1, 1], vec![0, 0]];
+    println!("{:?}", sweep(&mut vector_of_vectors));
 }
