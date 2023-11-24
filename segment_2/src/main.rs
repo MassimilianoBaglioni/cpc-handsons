@@ -7,7 +7,7 @@ struct SegmentTree {
 impl SegmentTree {
     fn new(size: usize) -> Self {
         let mut tree = vec![0; 4 * size];
-        let lazy = vec![0; 4 * size];
+        let lazy = vec![i64::MAX; 4 * size];
         Self { tree, lazy, size }
     }
 
@@ -77,8 +77,8 @@ impl SegmentTree {
             // Update the range and mark for lazy propagation
             self.tree[node] = self.tree[node].min(value);
             if start != end {
-                self.lazy[2 * node + 1] = value;
-                self.lazy[2 * node + 2] = value;
+                self.lazy[2 * node + 1] = self.lazy[2 * node + 1].min(value);
+                self.lazy[2 * node + 2] = self.lazy[2 * node + 2].min(value);
             }
             return;
         }
@@ -91,14 +91,14 @@ impl SegmentTree {
     }
 
     fn propagate(&mut self, node: usize, start: usize, end: usize) {
-        if self.lazy[node] != 0 {
+        if self.lazy[node] != i64::MAX {
             // Update the node and mark for lazy propagation
             self.tree[node] = self.tree[node].min(self.lazy[node]);
             if start != end {
-                self.lazy[2 * node + 1] = self.lazy[node];
-                self.lazy[2 * node + 2] = self.lazy[node];
+                self.lazy[2 * node + 1] = self.lazy[node].min(self.lazy[2 * node + 1]);
+                self.lazy[2 * node + 2] = self.lazy[node].min(self.lazy[2 * node + 2]);
             }
-            self.lazy[node] = 0; // Reset lazy value
+            self.lazy[node] = i64::MAX; // Reset lazy value
         }
     }
 }
@@ -179,86 +179,4 @@ fn main() {
     let arr = vec![9, 4, 1, 6, 5, 10, 6, 8, 7, 4];
     let mut segment_tree = SegmentTree::new(arr.len());
     segment_tree.build(&arr);
-
-    // Test 1
-    println!("Initial array: {:?}", arr);
-    println!("Max in range [5, 8]: {}", segment_tree.query_range(5, 8));
-
-    // Test 2
-    segment_tree.update_range_with_value(6, 7, 10);
-    println!("Max in range [6, 8]: {}", segment_tree.query_range(6, 8));
-
-    // Test 3
-    segment_tree.update_range_with_value(3, 10, 4);
-    println!("Max in range [2, 4]: {}", segment_tree.query_range(2, 4));
-
-    // Test 4
-    println!("Max in range [1, 9]: {}", segment_tree.query_range(1, 9));
-
-    // Test 5
-    segment_tree.update_range_with_value(8, 9, 3);
-    println!("Max in range [8, 8]: {}", segment_tree.query_range(8, 8));
-
-    // Test 6
-    segment_tree.update_range_with_value(4, 5, 7);
-    println!("Max in range [4, 10]: {}", segment_tree.query_range(4, 10));
-
-    // Test 7
-    segment_tree.update_range_with_value(9, 10, 1);
-    println!(
-        "Max in range [10, 10]: {}",
-        segment_tree.query_range(10, 10)
-    );
-
-    // Test 8
-    segment_tree.update_range_with_value(1, 3, 2);
-    println!("Max in range [1, 3]: {}", segment_tree.query_range(1, 3));
-
-    // Test 9
-    println!("Max in range [7, 9]: {}", segment_tree.query_range(7, 9));
-
-    // Test 10
-    segment_tree.update_range_with_value(2, 6, 5);
-    println!("Max in range [2, 6]: {}", segment_tree.query_range(2, 6));
-
-    // Additional Tests
-    segment_tree.update_range_with_value(4, 6, 15);
-    println!("Max in range [4, 6]: {}", segment_tree.query_range(4, 6));
-
-    segment_tree.update_range_with_value(1, 5, 8);
-    println!("Max in range [1, 5]: {}", segment_tree.query_range(1, 5));
-
-    segment_tree.update_range_with_value(3, 8, 12);
-    println!("Max in range [3, 8]: {}", segment_tree.query_range(3, 8));
-
-    segment_tree.update_range_with_value(1, 10, 20);
-    println!("Max in range [1, 10]: {}", segment_tree.query_range(1, 10));
-
-    segment_tree.update_range_with_value(5, 9, 3);
-    println!("Max in range [5, 9]: {}", segment_tree.query_range(5, 9));
-
-    segment_tree.update_range_with_value(2, 7, 10);
-    println!("Max in range [2, 7]: {}", segment_tree.query_range(2, 7));
-
-    segment_tree.update_range_with_value(1, 4, 5);
-    println!("Max in range [1, 4]: {}", segment_tree.query_range(1, 4));
-
-    segment_tree.update_range_with_value(6, 8, 18);
-    println!("Max in range [6, 8]: {}", segment_tree.query_range(6, 8));
-
-    segment_tree.update_range_with_value(3, 5, 7);
-    println!("Max in range [3, 5]: {}", segment_tree.query_range(3, 5));
-
-    segment_tree.update_range_with_value(1, 7, 14);
-    println!("Max in range [1, 7]: {}", segment_tree.query_range(1, 7));
-
-    segment_tree.update_range_with_value(4, 8, 22);
-    println!("Max in range [4, 8]: {}", segment_tree.query_range(4, 8));
-
-    segment_tree.update_range_with_value(2, 9, 13);
-    println!("Max in range [2, 9]: {}", segment_tree.query_range(2, 9));
-
-    segment_tree.update_range_with_value(1, 6, 25);
-    segment_tree.update_range_with_value(1, 6, 2);
-    println!("Max in range [1, 6]: {}", segment_tree.query_range(1, 6));
 }
