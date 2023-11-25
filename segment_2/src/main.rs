@@ -6,7 +6,7 @@ struct SegmentTree {
 
 impl SegmentTree {
     fn new(size: usize) -> Self {
-        let mut tree = vec![0; 4 * size];
+        let mut tree = vec![i64::MIN; 4 * size];
         let lazy = vec![i64::MAX; 4 * size];
         Self { tree, lazy, size }
     }
@@ -101,17 +101,57 @@ impl SegmentTree {
             self.lazy[node] = i64::MAX; // Reset lazy value
         }
     }
+
+    fn query_vectors(&mut self, left: usize, right: usize, value: i64) -> i32 {
+        if self.query_vectors_recursive(0, 0, self.size - 1, left, right, value) {
+            1
+        } else {
+            0
+        }
+    }
+
+    fn query_vectors_recursive(
+        &mut self,
+        node: usize,
+        start: usize,
+        end: usize,
+        left: usize,
+        right: usize,
+        value: i64,
+    ) -> bool {
+        if right < start || left > end {
+            return false; // Out of range
+        }
+
+        if left <= start && right >= end {
+            if self.tree[node] == value {
+                return true;
+            }
+            if self.tree[node] < value {
+                return false;
+            }
+        }
+
+        if start == end {
+            return false;
+        }
+
+        let mid = (start + end) / 2;
+        let left_child = self.query_vectors_recursive(2 * node + 1, start, mid, left, right, value);
+        let right_child =
+            self.query_vectors_recursive(2 * node + 2, mid + 1, end, left, right, value);
+        left_child || right_child
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use std::fs;
+    use std::path::Path;
+    use std::path::PathBuf;
     #[test]
     fn run_tests() {
-        use super::*;
-        use std::fs;
-        use std::path::Path;
-        use std::path::PathBuf;
-
         let directory_path = "src/Testset_handson2_2324_p1/";
         let mut tree: SegmentTree;
 
@@ -173,6 +213,73 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn test2() {
+        let directory_path = "src/Testset_handson2_2324_p2/";
+
+        for i in 0..=7 {
+            let input_filename = format! {"input{}.txt", i};
+            let output_filename = format! {"output{}.txt", i};
+
+            let input_full_path = PathBuf::from(directory_path).join(Path::new(&input_filename));
+            let output_full_path = PathBuf::from(directory_path).join(Path::new(&output_filename));
+
+            let input_contents =
+                fs::read_to_string(input_full_path).expect("Failed to open the test file.");
+            let output_contents =
+                fs::read_to_string(output_full_path).expect("Failed to open the test file.");
+
+            let input_lines: Vec<&str> = input_contents.lines().collect();
+            let output_array: Vec<i64> = output_contents
+                .lines()
+                .map(|s| s.parse::<i64>().unwrap())
+                .collect();
+
+            let mut all_input_values: Vec<Vec<i64>> = Vec::new();
+
+            for line in input_lines.iter() {
+                let input_values: Vec<i64> = line
+                    .split_whitespace()
+                    .map(|s| s.parse::<i64>().unwrap())
+                    .collect();
+
+                all_input_values.push(input_values);
+            }
+
+            let mut input_vectors: Vec<Vec<i64>> = Vec::new();
+            for i in 1..=all_input_values[0][0] {
+                input_vectors.push(all_input_values[i as usize].clone());
+            }
+
+            let leaves_array = sweep(&mut input_vectors);
+            let mut tree = SegmentTree::new(leaves_array.len());
+            tree.build(&leaves_array);
+
+            for (index, query) in (all_input_values[0][0] + 1
+                ..=all_input_values[0][0] + all_input_values[0][1])
+                .enumerate()
+            {
+                println!(
+                    "returned: {} expected: {}",
+                    tree.query_vectors(
+                        all_input_values[query as usize][0] as usize,
+                        all_input_values[query as usize][1] as usize,
+                        all_input_values[query as usize][2]
+                    ),
+                    output_array[index as usize] as i32
+                );
+
+                assert!(
+                    tree.query_vectors(
+                        all_input_values[query as usize][0] as usize,
+                        all_input_values[query as usize][1] as usize,
+                        all_input_values[query as usize][2]
+                    ) == output_array[index as usize] as i32
+                );
+            }
+        }
+    }
 }
 
 //Overall complexity n log n
@@ -194,7 +301,6 @@ fn sweep(array: &mut Vec<Vec<i64>>) -> Vec<i64> {
     let mut result_array = vec![0; max as usize + 2];
 
     events.sort_by(|a, b| a.cmp(b));
-    println!("{:?}", events);
 
     let mut events_pointer = 0;
     let mut crt = 0;
@@ -215,10 +321,20 @@ fn sweep(array: &mut Vec<Vec<i64>>) -> Vec<i64> {
 }
 
 fn main() {
-    let mut vector_of_vectors: Vec<Vec<i64>> =
-        vec![vec![0, 4], vec![0, 2], vec![0, 0], vec![0, 0], vec![0, 0]];
+    let mut vector_of_vectors: Vec<Vec<i64>> = vec![
+        vec![2, 6],
+        vec![3, 8],
+        vec![4, 6],
+        vec![1, 1],
+        vec![5, 9],
+        vec![6, 7],
+        vec![8, 9],
+        vec![0, 7],
+        vec![1, 2],
+        vec![2, 7],
+    ];
     let leaves = sweep(&mut vector_of_vectors);
+    //println!("{:?}", leaves);
     let mut tree = SegmentTree::new(leaves.len());
     tree.build(&leaves);
-    println!("{:?}", tree.tree);
 }
