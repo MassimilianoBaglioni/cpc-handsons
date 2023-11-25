@@ -175,23 +175,40 @@ mod tests {
     }
 }
 
+//Overall complexity n log n
 fn sweep(array: &mut Vec<Vec<i64>>) -> Vec<i64> {
-    let mut result_array = vec![0; array.len() + 1];
+    let mut max = -1;
     let mut events = vec![[0, 0]; 2 * array.len()];
 
+    //Using n log n to sort.
     array.sort_by(|a, b| a.cmp(b));
     for (index, el) in array.iter().enumerate() {
         events[index * 2][0] = el[0];
         events[index * 2][1] = 1;
         events[index * 2 + 1][0] = el[1] + 1;
         events[index * 2 + 1][1] = -1;
+        if el[1] > max {
+            max = el[1];
+        }
     }
+    let mut result_array = vec![0; max as usize + 2];
+
     events.sort_by(|a, b| a.cmp(b));
     println!("{:?}", events);
+
+    let mut events_pointer = 0;
     let mut crt = 0;
-    for el in events {
-        crt += el[1];
-        result_array[el[0] as usize] = crt;
+    //Using double pointer technique we are going trough both arrays so we are spending n+m time complexity.
+    for i in 0..result_array.len() {
+        while events[events_pointer][0] == i as i64 {
+            crt += events[events_pointer][1];
+            result_array[i] = crt;
+            events_pointer += 1;
+            if events_pointer == events.len() {
+                break;
+            }
+        }
+        result_array[i] = crt;
     }
 
     return result_array[0..result_array.len() - 1].to_vec();
@@ -199,6 +216,9 @@ fn sweep(array: &mut Vec<Vec<i64>>) -> Vec<i64> {
 
 fn main() {
     let mut vector_of_vectors: Vec<Vec<i64>> =
-        vec![vec![0, 4], vec![1, 3], vec![1, 2], vec![1, 1], vec![0, 0]];
-    println!("{:?}", sweep(&mut vector_of_vectors));
+        vec![vec![0, 4], vec![0, 2], vec![0, 0], vec![0, 0], vec![0, 0]];
+    let leaves = sweep(&mut vector_of_vectors);
+    let mut tree = SegmentTree::new(leaves.len());
+    tree.build(&leaves);
+    println!("{:?}", tree.tree);
 }
