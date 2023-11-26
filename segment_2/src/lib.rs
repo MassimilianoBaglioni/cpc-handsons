@@ -109,7 +109,7 @@ impl SegmentTree {
     }
 
     //Wrapper function for query_vectors_recursive, that returns 1 or 0 instead of bool.
-    pub fn query_vectors(&mut self, left: usize, right: usize, value: i64) -> i32 {
+    pub fn is_there(&mut self, left: usize, right: usize, value: i64) -> i32 {
         if self.query_vectors_recursive(0, 0, self.size - 1, left, right, value) {
             1
         } else {

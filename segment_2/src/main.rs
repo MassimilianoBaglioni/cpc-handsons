@@ -124,7 +124,7 @@ mod tests {
             {
                 println!(
                     "returned: {} expected: {}",
-                    tree.query_vectors(
+                    tree.is_there(
                         all_input_values[query as usize][0] as usize,
                         all_input_values[query as usize][1] as usize,
                         all_input_values[query as usize][2]
@@ -133,7 +133,7 @@ mod tests {
                 );
 
                 assert!(
-                    tree.query_vectors(
+                    tree.is_there(
                         all_input_values[query as usize][0] as usize,
                         all_input_values[query as usize][1] as usize,
                         all_input_values[query as usize][2]
