@@ -7,11 +7,14 @@ mod tests {
     use std::fs;
     use std::path::Path;
     use std::path::PathBuf;
+
+    //First function to test the first assignemnt.
     #[test]
     fn run_tests() {
         let directory_path = "src/Testset_handson2_2324_p1/";
         let mut tree: SegmentTree;
 
+        //Hardcoded, should read the number of txt files in the folder instead.
         for i in 0..=10 {
             let input_filename = format! {"input{}.txt", i};
             let output_filename = format! {"output{}.txt", i};
@@ -71,10 +74,12 @@ mod tests {
         }
     }
 
+    //Second function to test the second assignemnt.
     #[test]
     fn test2() {
         let directory_path = "src/Testset_handson2_2324_p2/";
 
+        //Hardcoded, should read the number of txt files in the folder instead.
         for i in 0..=7 {
             let input_filename = format! {"input{}.txt", i};
             let output_filename = format! {"output{}.txt", i};
