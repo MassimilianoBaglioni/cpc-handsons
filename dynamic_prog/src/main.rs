@@ -151,7 +151,6 @@ fn binary_search(arr: &mut Vec<i32>, target: i32) -> Option<usize> {
 }
 
 fn get_diff_sorted(mut list_of_lists: Vec<Vec<i32>>) -> Vec<i32> {
-    // Sort by the first value and then by the second value
     list_of_lists.sort_by(|a, b| {
         let cmp = a[0].cmp(&b[0]);
         if cmp != std::cmp::Ordering::Equal {
@@ -161,16 +160,16 @@ fn get_diff_sorted(mut list_of_lists: Vec<Vec<i32>>) -> Vec<i32> {
         a[1].cmp(&b[1])
     });
 
-    // Extract the second values and return them
     list_of_lists.into_iter().map(|pair| pair[1]).collect()
 }
 
 fn lsi(mut list_of_lists: Vec<Vec<i32>>) -> usize {
-    let mut diff_vec = get_diff_sorted(list_of_lists);
-    let mut lsi_vec = vec![i32::MAX];
+    let mut diff_vec = get_diff_sorted(list_of_lists); //N log n time coplexity for sorting, actually 2 sorts.
+    let mut lsi_vec = vec![i32::MAX]; //N space complexity
 
     for i in diff_vec {
-        binary_search(&mut lsi_vec, i);
+        //N time complexity
+        binary_search(&mut lsi_vec, i); //log n time complexity
     }
     lsi_vec.len()
 }
