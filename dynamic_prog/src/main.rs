@@ -42,6 +42,52 @@ mod tests {
             assert!(max_vacation(input_values, days as usize) == output_array[0]);
         }
     }
+    #[test]
+
+    fn readfile2() {
+        use super::lsi;
+        use std::fs;
+        use std::path::Path;
+        use std::path::PathBuf;
+
+        let directory_path = "src/TestSet2/";
+
+        for i in 0..=4 {
+            let input_filename = format! {"input{}.txt", i};
+            let output_filename = format! {"output{}.txt", i};
+
+            let input_full_path = PathBuf::from(directory_path).join(Path::new(&input_filename));
+            let output_full_path = PathBuf::from(directory_path).join(Path::new(&output_filename));
+
+            let input_contents =
+                fs::read_to_string(input_full_path).expect("Failed to open the test file.");
+            let output_contents =
+                fs::read_to_string(output_full_path).expect("Failed to open the test file.");
+
+            let input_lines: Vec<&str> = input_contents.lines().collect();
+            let output_array: Vec<i32> = output_contents
+                .lines()
+                .map(|s| s.parse::<i32>().unwrap())
+                .collect();
+
+            let mut input_values: Vec<Vec<i32>> = Vec::new();
+
+            for line in input_lines.iter() {
+                let tmp_list: Vec<i32> = line
+                    .split_whitespace()
+                    .map(|s| s.parse::<i32>().unwrap())
+                    .collect();
+
+                input_values.push(tmp_list);
+            }
+            input_values.remove(0);
+            input_values.retain(|inner_list| !inner_list.is_empty()); // Tests work even with empty lines between rows with this.
+            println!("{:?}", input_values);
+            println!("{:?}", output_array);
+
+            assert!(lsi(input_values) == output_array[0] as usize);
+        }
+    }
 }
 
 fn max_vacation(matrix: Vec<Vec<i32>>, days: usize) -> i32 {
@@ -71,16 +117,6 @@ fn max_vacation(matrix: Vec<Vec<i32>>, days: usize) -> i32 {
     }
     dp_matrix[row_size][days]
 }
-
-// fn print_matrix(matrix: &Vec<Vec<i32>>) {
-//     for row in matrix {
-//         for &element in row {
-//             print!("{:4} ", element);
-//         }
-//         println!();
-//     }
-//     println!("---------------------------");
-// }
 
 fn binary_search(arr: &mut Vec<i32>, target: i32) -> Option<usize> {
     let mut low = 0;
@@ -139,15 +175,4 @@ fn lsi(mut list_of_lists: Vec<Vec<i32>>) -> usize {
     lsi_vec.len()
 }
 
-fn main() {
-    println!(
-        "{}",
-        lsi(vec![
-            vec![0, 3],
-            vec![99, 1],
-            vec![11, 20],
-            vec![1, 2],
-            vec![10, 5],
-        ])
-    );
-}
+fn main() {}
