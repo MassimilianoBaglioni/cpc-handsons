@@ -103,8 +103,6 @@ fn binary_search(arr: &mut Vec<i32>, target: i32) -> Option<usize> {
 
     // Use the binary search result to find the position to replace the next greater item
     let insert_index = if arr[mid] < target { mid + 1 } else { mid };
-    println!("{}", insert_index);
-    println!("{:?}", arr);
 
     if insert_index < arr.len() && arr[insert_index] == target {
         return Some(insert_index);
@@ -116,13 +114,40 @@ fn binary_search(arr: &mut Vec<i32>, target: i32) -> Option<usize> {
     None
 }
 
-fn main() {
-    let mut array = vec![i32::MAX];
-    let mut to_insert = [78, 29, 35, 38, 100, 14, 96, 21, 14, 49, 52, 93, 87, 84, 76];
-    println!("{:?}", array);
+fn get_diff_sorted(mut list_of_lists: Vec<Vec<i32>>) -> Vec<i32> {
+    // Sort by the first value and then by the second value
+    list_of_lists.sort_by(|a, b| {
+        let cmp = a[0].cmp(&b[0]);
+        if cmp != std::cmp::Ordering::Equal {
+            return cmp;
+        }
 
-    for i in to_insert {
-        binary_search(&mut array, i);
-        println!("{:?}", array);
+        a[1].cmp(&b[1])
+    });
+
+    // Extract the second values and return them
+    list_of_lists.into_iter().map(|pair| pair[1]).collect()
+}
+
+fn lsi(mut list_of_lists: Vec<Vec<i32>>) -> usize {
+    let mut diff_vec = get_diff_sorted(list_of_lists);
+    let mut lsi_vec = vec![i32::MAX];
+
+    for i in diff_vec {
+        binary_search(&mut lsi_vec, i);
     }
+    lsi_vec.len()
+}
+
+fn main() {
+    println!(
+        "{}",
+        lsi(vec![
+            vec![0, 3],
+            vec![99, 1],
+            vec![11, 20],
+            vec![1, 2],
+            vec![10, 5],
+        ])
+    );
 }
