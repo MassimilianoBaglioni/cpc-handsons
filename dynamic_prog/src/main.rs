@@ -118,6 +118,9 @@ fn max_vacation(matrix: Vec<Vec<i32>>, days: usize) -> i32 {
     dp_matrix[row_size][days]
 }
 
+//Second point.
+
+//Modified version of binary search to insert items in log n instead of n.
 fn binary_search(arr: &mut Vec<i32>, target: i32) -> Option<usize> {
     let mut low = 0;
     let mut high = arr.len() - 1;
@@ -137,7 +140,7 @@ fn binary_search(arr: &mut Vec<i32>, target: i32) -> Option<usize> {
         }
     }
 
-    // Use the binary search result to find the position to replace the next greater item
+    // Use the binary search result to find the position to replace the next greater item.
     let insert_index = if arr[mid] < target { mid + 1 } else { mid };
 
     if insert_index < arr.len() && arr[insert_index] == target {
@@ -150,6 +153,7 @@ fn binary_search(arr: &mut Vec<i32>, target: i32) -> Option<usize> {
     None
 }
 
+//Sort by the first index, if two values are equal sort by the second key.
 fn get_diff_sorted(mut list_of_lists: Vec<Vec<i32>>) -> Vec<i32> {
     list_of_lists.sort_by(|a, b| {
         let cmp = a[0].cmp(&b[0]);
@@ -163,13 +167,14 @@ fn get_diff_sorted(mut list_of_lists: Vec<Vec<i32>>) -> Vec<i32> {
     list_of_lists.into_iter().map(|pair| pair[1]).collect()
 }
 
+//This fucntion sorts the given list, then finds the longest increasing subsequence using the binary search version.
 fn lsi(mut list_of_lists: Vec<Vec<i32>>) -> usize {
     let mut diff_vec = get_diff_sorted(list_of_lists); //N log n time coplexity for sorting, actually 2 sorts.
-    let mut lsi_vec = vec![i32::MAX]; //N space complexity
+    let mut lsi_vec = vec![i32::MAX]; //N space complexity.
 
     for i in diff_vec {
         //N time complexity
-        binary_search(&mut lsi_vec, i); //log n time complexity
+        binary_search(&mut lsi_vec, i); //log n time complexity.
     }
     lsi_vec.len()
 }
