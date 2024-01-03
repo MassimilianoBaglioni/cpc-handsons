@@ -45,14 +45,14 @@ mod tests {
     #[test]
 
     fn readfile2() {
-        use super::lsi;
+        use super::dp_lsi;
         use std::fs;
         use std::path::Path;
         use std::path::PathBuf;
 
         let directory_path = "src/TestSet2/";
 
-        for i in 0..=4 {
+        for i in 0..=10 {
             let input_filename = format! {"input{}.txt", i};
             let output_filename = format! {"output{}.txt", i};
 
@@ -82,10 +82,7 @@ mod tests {
             }
             input_values.remove(0);
             input_values.retain(|inner_list| !inner_list.is_empty()); // Tests work even with empty lines between rows with this.
-            println!("{:?}", input_values);
-            println!("{:?}", output_array);
-
-            assert!(lsi(input_values) == output_array[0] as usize);
+            assert!(dp_lsi(input_values) == output_array[0]);
         }
     }
 }
@@ -93,7 +90,6 @@ mod tests {
 fn max_vacation(matrix: Vec<Vec<i32>>, days: usize) -> i32 {
     let row_size = matrix.len();
     let col_size = matrix[0].len();
-    //print_matrix(&matrix);
     let mut dp_matrix = vec![vec![0; col_size + 1]; row_size + 1];
 
     for i in 1..row_size + 1 {
@@ -118,44 +114,8 @@ fn max_vacation(matrix: Vec<Vec<i32>>, days: usize) -> i32 {
     dp_matrix[row_size][days]
 }
 
-//Second point.
-
-//Modified version of binary search to insert items in log n instead of n.
-fn binary_search(arr: &mut Vec<i32>, target: i32) -> Option<usize> {
-    let mut low = 0;
-    let mut high = arr.len() - 1;
-    let mut mid = 0;
-
-    while low <= high {
-        mid = low + (high - low) / 2;
-        if arr[mid] == target {
-            return Some(mid);
-        } else if arr[mid] < target {
-            low = mid + 1;
-        } else {
-            if mid == 0 {
-                break;
-            }
-            high = mid - 1;
-        }
-    }
-
-    // Use the binary search result to find the position to replace the next greater item.
-    let insert_index = if arr[mid] < target { mid + 1 } else { mid };
-
-    if insert_index < arr.len() && arr[insert_index] == target {
-        return Some(insert_index);
-    } else if insert_index >= arr.len() {
-        arr.push(target);
-    } else {
-        arr[insert_index] = target;
-    }
-    None
-}
-
-//Sort by the first index, if two values are equal sort by the second key.
-fn get_diff_sorted(mut list_of_lists: Vec<Vec<i32>>) -> Vec<i32> {
-    list_of_lists.sort_by(|a, b| {
+fn dp_lsi(mut array: Vec<Vec<i32>>) -> i32 {
+    array.sort_by(|a, b| {
         let cmp = a[0].cmp(&b[0]);
         if cmp != std::cmp::Ordering::Equal {
             return cmp;
@@ -164,19 +124,80 @@ fn get_diff_sorted(mut list_of_lists: Vec<Vec<i32>>) -> Vec<i32> {
         a[1].cmp(&b[1])
     });
 
-    list_of_lists.into_iter().map(|pair| pair[1]).collect()
-}
+    let mut lis = vec![1; array.len()];
 
-//This fucntion sorts the given list, then finds the longest increasing subsequence using the binary search version.
-fn lsi(mut list_of_lists: Vec<Vec<i32>>) -> usize {
-    let mut diff_vec = get_diff_sorted(list_of_lists); //N log n time coplexity for sorting, actually 2 sorts.
-    let mut lsi_vec = vec![i32::MAX]; //N space complexity.
-
-    for i in diff_vec {
-        //N time complexity
-        binary_search(&mut lsi_vec, i); //log n time complexity.
+    for i in 1..=array.len() - 1 {
+        for j in 0..i {
+            if array[i][1] > array[j][1] && lis[i] <= lis[j] && array[i][0] > array[j][0] {
+                lis[i] = lis[j] + 1;
+            }
+        }
     }
-    lsi_vec.len()
+
+    if let Some(max_value) = lis.iter().max() {
+        *max_value
+    } else {
+        -1
+    }
 }
 
 fn main() {}
+
+//Modified version of binary search to insert items in log n instead of n.
+// fn binary_search(arr: &mut Vec<i32>, target: i32) -> Option<usize> {
+//     let mut low = 0;
+//     let mut high = arr.len() - 1;
+//     let mut mid = 0;
+
+//     while low <= high {
+//         mid = low + (high - low) / 2;
+//         if arr[mid] == target {
+//             return Some(mid);
+//         } else if arr[mid] < target {
+//             low = mid + 1;
+//         } else {
+//             if mid == 0 {
+//                 break;
+//             }
+//             high = mid - 1;
+//         }
+//     }
+
+//     // Use the binary search result to find the position to replace the next greater item.
+//     let insert_index = if arr[mid] < target { mid + 1 } else { mid };
+
+//     if insert_index < arr.len() && arr[insert_index] == target {
+//         return Some(insert_index);
+//     } else if insert_index >= arr.len() {
+//         arr.push(target);
+//     } else {
+//         arr[insert_index] = target;
+//     }
+//     None
+// }
+
+// //Sort by the first index, if two values are equal sort by the second key.
+// fn get_diff_sorted(mut list_of_lists: Vec<Vec<i32>>) -> Vec<i32> {
+//     list_of_lists.sort_by(|a, b| {
+//         let cmp = a[0].cmp(&b[0]);
+//         if cmp != std::cmp::Ordering::Equal {
+//             return cmp;
+//         }
+
+//         a[1].cmp(&b[1])
+//     });
+
+//     list_of_lists.into_iter().map(|pair| pair[1]).collect()
+// }
+
+// //This fucntion sorts the given list, then finds the longest increasing subsequence using the binary search version.
+// fn lsi(mut list_of_lists: Vec<Vec<i32>>) -> usize {
+//     let mut diff_vec = get_diff_sorted(list_of_lists); //N log n time coplexity for sorting, actually 2 sorts.
+//     let mut lsi_vec = vec![i32::MAX]; //N space complexity.
+
+//     for i in diff_vec {
+//         //N time complexity
+//         binary_search(&mut lsi_vec, i); //log n time complexity.
+//     }
+//     lsi_vec.len()
+// }
